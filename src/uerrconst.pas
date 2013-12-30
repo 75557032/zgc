@@ -9,6 +9,13 @@ uses
 
 const
   SMakeOK=0;
+  SLoadSourceOK=1;
+  SPrecompiledSourceOK=2;
+  SBuildGrammarTreeOK=3;
+  SCompileToLLVMOK=4;
+  SWriteOutFileOK=5;
+
+
   SErrNoFindSource=-1;
 
 implementation

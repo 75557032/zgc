@@ -31,7 +31,7 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <Units Count="3">
+    <Units Count="4">
       <Unit0>
         <Filename Value="zgc.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -47,6 +47,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="uerrconst"/>
       </Unit2>
+      <Unit3>
+        <Filename Value="useparateline.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="useparateline"/>
+      </Unit3>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -59,6 +64,11 @@
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="..\lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <Linking>
+      <Debugging>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
+    </Linking>
     <Other>
       <CompilerMessages>
         <MsgFileName Value=""/>

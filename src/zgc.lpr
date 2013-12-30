@@ -1,7 +1,7 @@
 program zgc;
 
 uses
-  umain, uerrconst;
+  umain, uerrconst, useparateline;
 
 begin
   EchoMakeResult(MakeMain(GetSourceFile,GetOutFile));
