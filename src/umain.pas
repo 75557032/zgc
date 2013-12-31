@@ -44,42 +44,36 @@ end;
 function MakeMain(const ASourceFileName, AOutFileName: string): integer;
 var
   LSourceList: TList;
-  LErrID: integer;
   LOutList: TStringList;
 begin
   Result := SMakeOK;
   LSourceList := TList.Create;
   try
-    LErrID := LoadSource(ASourceFileName, LSourceList);
-    if LErrID <> SLoadSourceOK then
+    Result := LoadSource(ASourceFileName, LSourceList);
+    if Result <> SLoadSourceOK then
     begin
-      Result := LErrID;
       Exit;
     end;
-    LErrID := PrecompiledSource(LSourceList);
-    if LErrID <> SPrecompiledSourceOK then
+    Result := PrecompiledSource(LSourceList);
+    if Result <> SPrecompiledSourceOK then
     begin
-      Result := LErrID;
       Exit;
     end;
-    LErrID := BuildGrammarTree(LSourceList);
-    if LErrID <> SBuildGrammarTreeOK then
+    Result := BuildGrammarTree(LSourceList);
+    if Result <> SBuildGrammarTreeOK then
     begin
-      Result := LErrID;
       Exit;
     end;
     LOutList := TStringList.Create;
     try
-      LErrID := CompileToLLVM(LSourceList, LOutList);
-      if LErrID <> SCompileToLLVMOK then
+      Result := CompileToLLVM(LSourceList, LOutList);
+      if Result <> SCompileToLLVMOK then
       begin
-        Result := LErrID;
         Exit;
       end;
-      LErrID := WriteOutFile(AOutFileName, LOutList);
-      if LErrID <> SWriteOutFileOK then
+      Result := WriteOutFile(AOutFileName, LOutList);
+      if Result <> SWriteOutFileOK then
       begin
-        Result := LErrID;
         Exit;
       end;
     finally
