@@ -14,6 +14,7 @@ const
   SBuildGrammarTreeOK=3;
   SCompileToLLVMOK=4;
   SWriteOutFileOK=5;
+  SLoadFileToListOK=6;
 
 
   SErrNoFindSource=-1;

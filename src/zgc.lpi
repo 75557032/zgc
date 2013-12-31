@@ -48,9 +48,9 @@
         <UnitName Value="uerrconst"/>
       </Unit2>
       <Unit3>
-        <Filename Value="useparateline.pas"/>
+        <Filename Value="uloadsource.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="useparateline"/>
+        <UnitName Value="uloadsource"/>
       </Unit3>
     </Units>
   </ProjectOptions>
@@ -64,6 +64,11 @@
       <IncludeFiles Value="$(ProjOutDir)"/>
       <UnitOutputDirectory Value="..\lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
+    <CodeGeneration>
+      <Optimizations>
+        <OptimizationLevel Value="3"/>
+      </Optimizations>
+    </CodeGeneration>
     <Linking>
       <Debugging>
         <UseHeaptrc Value="True"/>

@@ -5,7 +5,7 @@ unit umain;
 interface
 
 uses
-  Classes, SysUtils, uerrconst, useparateline;
+  Classes, SysUtils, uerrconst, uloadsource;
 
 var
   gGlobalParameters: string;
@@ -103,7 +103,11 @@ begin
   begin
     LSourceFileHandle := FileOpen(ASourceFileName, fmOpenRead);
     try
-      //分词
+      Result:=LoadFileToList(LSourceFileHandle,AOutList);
+      if Result <> SLoadFileToListOK then
+      begin
+        Exit;
+      end;
     finally
       FileClose(LSourceFileHandle);
     end;
