@@ -5,9 +5,9 @@ unit uloadsource;
 interface
 
 uses
-  Classes, SysUtils, uerrconst;
+  Classes,SysUtils, uerrconst, ubasetype;
 
-function LoadFileToList(ASourceFileHandle: Integer; AOutList: TList):Integer;
+function LoadFileToList(ASourceFileHandle: Integer; AOutList: PZGCList):Integer;
 
 implementation
 
@@ -35,7 +35,7 @@ end;
 *************************************************************************}
 function CheckWordEof(AChar:Char):Boolean;
 begin
-  Result:=AChar='2';
+  Result:=(AChar='2') or (AChar=#10);
 end;
 
 {*************************************************************************
@@ -49,45 +49,44 @@ end;
 {*************************************************************************
 加载文件到List，完成分行，分词
 *************************************************************************}
-function LoadFileToList(ASourceFileHandle: Integer; AOutList: TList):Integer;
+function LoadFileToList(ASourceFileHandle: Integer; AOutList: PZGCList):Integer;
 var
   LBuf:array[0..BufCount-1] of Char;
   LReadCount,LReadIndex,i:Integer;
-  LTempList:TStringList;
+  LTempList:PZGCList;
   LTempStr:string;
 begin
   LReadIndex:=0;
   LTempStr:='';
-  LTempList:=TStringList.Create;
-  AOutList.Add(LTempList);
+  LTempList:=CreateLineList;
+  AddPointerToList(LTempList,AOutList);
   repeat
     FileSeek(ASourceFileHandle,LReadIndex*BufCount,soFromBeginning);
     LReadCount:=FileRead(ASourceFileHandle,LBuf,BufCount);
     for i:=0 to LReadCount-1 do
     begin
-      if CheckLineEof(LBuf[i]) then
-      begin
-        LTempList:=TStringList.Create;
-        AOutList.Add(LTempList);
-        Continue;
-      end;
       if IsUnUseChar(LBuf[i]) then
       begin
         Continue;
       end;
       if CheckWordEof(LBuf[i]) then
       begin
-        LTempList.Add(LTempStr);
+        AddStrToList(LTempStr,LTempList);
         LTempStr:='';
       end
       else
       begin
         LTempStr:=LTempStr+LBuf[i];
       end;
+      if CheckLineEof(LBuf[i]) then
+      begin
+        LTempList:=CreateLineList;
+        AddPointerToList(LTempList,AOutList);
+      end;
     end;
-    LTempList.Add(LTempStr);
     LReadIndex:=LReadIndex+1;
   until CheckReadEof(LReadCount);
+  AddStrToList(LTempStr,LTempList);
   Result:=SLoadFileToListOK;
 end;
 

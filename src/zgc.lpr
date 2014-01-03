@@ -1,7 +1,7 @@
 program zgc;
 
 uses
-  umain, uerrconst, uloadsource;
+  umain, uerrconst, uloadsource, ubasetype;
 
 begin
   EchoMakeResult(MakeMain(GetSourceFile,GetOutFile));

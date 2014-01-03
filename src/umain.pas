@@ -5,7 +5,7 @@ unit umain;
 interface
 
 uses
-  Classes, SysUtils, uerrconst, uloadsource;
+  sysutils,uerrconst, uloadsource, ubasetype;
 
 var
   gGlobalParameters: string;
@@ -14,11 +14,12 @@ function GetSourceFile: string;
 function GetOutFile: string;
 function MakeMain(const ASourceFileName, AOutFileName: string): integer;
 procedure EchoMakeResult(AResult: integer);
-function LoadSource(ASourceFileName: string; AOutList: TList): integer;
-function PrecompiledSource(ASourceList: TList): integer;
-function BuildGrammarTree(ASourceList: TList): integer;
-function CompileToLLVM(ASourceList: TList; AOutList: TStringList): integer;
-function WriteOutFile(AOutFileName: string; AWriteList: TStringList): integer;
+function LoadSource(ASourceFileName: string; AOutList: PZGCList): integer;
+function PrecompiledSource(ASourceList: PZGCList): integer;
+function BuildGrammarTree(ASourceList: PZGCList): integer;
+function CompileToLLVM(ASourceList, AOutList: PZGCList): integer;
+function WriteOutFile(AOutFileName: string; AWriteList: PZGCList): integer;
+procedure FreeList(ASourceList: PZGCList);
 
 implementation
 
@@ -43,11 +44,9 @@ end;
 *************************************************************************}
 function MakeMain(const ASourceFileName, AOutFileName: string): integer;
 var
-  LSourceList: TList;
-  LOutList: TStringList;
+  LSourceList, LOutList: PZGCList;
 begin
-  Result := SMakeOK;
-  LSourceList := TList.Create;
+  LSourceList:=CreateBlockList;
   try
     Result := LoadSource(ASourceFileName, LSourceList);
     if Result <> SLoadSourceOK then
@@ -64,7 +63,7 @@ begin
     begin
       Exit;
     end;
-    LOutList := TStringList.Create;
+    LOutList:=CreateBlockList;
     try
       Result := CompileToLLVM(LSourceList, LOutList);
       if Result <> SCompileToLLVMOK then
@@ -77,11 +76,12 @@ begin
         Exit;
       end;
     finally
-      LOutList.Free;
+      FreeList(LOutList);
     end;
   finally
-    LSourceList.Free;
+    FreeList(LSourceList);
   end;
+  Result := SMakeOK;
 end;
 
 {*************************************************************************
@@ -95,7 +95,7 @@ end;
 {*************************************************************************
 加载源文件，完成分句，分词
 *************************************************************************}
-function LoadSource(ASourceFileName: string; AOutList: TList): integer;
+function LoadSource(ASourceFileName: string; AOutList: PZGCList): integer;
 var
   LSourceFileHandle: integer;
 begin
@@ -122,7 +122,7 @@ end;
 {*************************************************************************
 预编译，连接头文件，替换宏定义，删除注释
 *************************************************************************}
-function PrecompiledSource(ASourceList: TList): integer;
+function PrecompiledSource(ASourceList: PZGCList): integer;
 begin
   Result := SPrecompiledSourceOK;
 end;
@@ -130,7 +130,7 @@ end;
 {*************************************************************************
 构建语法树，提取变量表，类型表，函数表，单元表
 *************************************************************************}
-function BuildGrammarTree(ASourceList: TList): integer;
+function BuildGrammarTree(ASourceList: PZGCList): integer;
 begin
   Result := SBuildGrammarTreeOK;
 end;
@@ -138,7 +138,7 @@ end;
 {*************************************************************************
 翻译至LLVM
 *************************************************************************}
-function CompileToLLVM(ASourceList: TList; AOutList: TStringList): integer;
+function CompileToLLVM(ASourceList, AOutList: PZGCList): integer;
 begin
   Result := SCompileToLLVMOK;
 end;
@@ -146,9 +146,38 @@ end;
 {*************************************************************************
 写入目标文件
 *************************************************************************}
-function WriteOutFile(AOutFileName: string; AWriteList: TStringList): integer;
+function WriteOutFile(AOutFileName: string; AWriteList: PZGCList): integer;
 begin
   Result := SWriteOutFileOK;
+end;
+
+{*************************************************************************
+释放文件List
+*************************************************************************}
+procedure FreeList(ASourceList: PZGCList);
+  procedure FreeStringList(AList:PZGCList);
+  begin
+    DisLineList(AList);
+  end;
+  procedure FreeBlockList(AList:PZGCList);
+  var
+    i:Integer;
+  begin
+    for i:=0 to AList^.Count-1 do
+    begin
+      if PZGCList(PPointerList(AList^.List)^[i])^.ListType=lt_Block then
+      begin
+        FreeBlockList(PZGCList(PPointerList(AList^.List)^[i]));
+      end
+      else
+      begin
+        FreeStringList(PZGCList(PPointerList(AList^.List)^[i]));
+      end;
+    end;
+    DisBlockList(AList);
+  end;
+begin
+  FreeBlockList(ASourceList);
 end;
 
 end.
